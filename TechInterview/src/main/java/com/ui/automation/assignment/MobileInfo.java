@@ -46,7 +46,7 @@ public class MobileInfo {
 		
 	// On Search box , Search for Apple mobile 	
 		WebElement search_Box =driver.findElement(By.xpath("//input[@type='text']"));
-		search_Box.sendKeys(Keys.ENTER, "apple mobiles", Keys.ENTER);
+		search_Box.sendKeys(Keys.ENTER, "mobile apple", Keys.ENTER);
 		
 	// Set the Price filter to get mobile under 30000
 		WebElement price_Filter=driver.findElement(By.xpath("//div[@class='_3uDYxP']//select[@class='_2YxCDZ']"));
@@ -56,30 +56,24 @@ public class MobileInfo {
 		
 	//Getting the Count of all Apple Phone after Price filter
 		int mobile_Count = driver.findElements(By.cssSelector("._4rR01T")).size();
-		String mobileprice;
-		int int_mobilePrice = 0;
 		
 	//	Store all Mobiles and their respective prices in a List
 		Thread.sleep(4000);
 		List<WebElement> List_of_Mobile=driver.findElements(By.cssSelector("._4rR01T"));
 		
 	// Created HasHmap so that we can store the Price & Device details in Key value pair
-		HashMap<Integer, String> map_final_products = new HashMap<Integer, String>();
+		HashMap<String, String> map_final_products = new HashMap<String, String>();
 		
 
 		for (int i = 0; i <mobile_Count; i++) {
 
 			String mobile_name = List_of_Mobile.get(i).getText();
 			String mobile_Price = driver.findElements(By.cssSelector("._30jeq3._1_WHN1")).get(i).getText();
-			
-
-			mobile_Price = mobile_Price.replaceAll("[^0-9]", "");// Replace anything with space other than numbers
-			int_mobilePrice = Integer.parseInt(mobile_Price);// Convert to Integer
-			map_final_products.put(int_mobilePrice, mobile_name);// Add product and price in HashMap
+			map_final_products.put(mobile_name,mobile_Price);// Add product and price in HashMap
 
 		}
 		//Getting the Product Name and Price in logs
-		Reporter.log("Product Name and price fetched from UI and saved in HashMap as:" + map_final_products.toString()
+		Reporter.log("Product Price and Description fetched from UI and saved in HashMap as:" + map_final_products.toString()
 				+ "<br>", true);
 
 		Set set_final_products =map_final_products.entrySet(); //converting HashMap into set
@@ -89,16 +83,17 @@ public class MobileInfo {
 			
 			
 			Map.Entry final_products = (Map.Entry)it.next(); //casting to Map.enrtry
-			
 			System.out.println(final_products.getValue() +" " +final_products.getKey()); 
-			
-			String separator = System.getProperty("line.separator");
+		
+			//Converting HashMap to CSV file 
+			String as = System.getProperty("line.separator");
 			try (Writer writer = new FileWriter("iphoneDetails.csv")) {
-			  for (Entry<Integer, String> entry : map_final_products.entrySet()) {
-			    writer.append(entry.getValue())
-			          .append(',')
-			          .append( separator, entry.getKey(), int_mobilePrice);
-			         
+			  for (Entry<String, String> entry : map_final_products.entrySet()) {
+			    writer.append(entry.getKey())
+			    .append(',')
+			    .append(entry.getValue())
+			    .append(as);
+			   
 			  }
 			} catch (IOException ex) {
 			  ex.printStackTrace(System.err);
